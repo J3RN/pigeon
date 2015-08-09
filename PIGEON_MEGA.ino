@@ -76,10 +76,11 @@ void adjustMotors() {
   Serial.print(F(" Roll: "));
   Serial.println(rollOut);
 
-  MOTOR_SPEEDS[TL] = saneSpeed(MOTOR_SPEEDS[TL], pitchOut + rollOut);
-  MOTOR_SPEEDS[TR] = saneSpeed(MOTOR_SPEEDS[TR], pitchOut - rollOut);
-  MOTOR_SPEEDS[BL] = saneSpeed(MOTOR_SPEEDS[BL], -pitchOut + rollOut);
-  MOTOR_SPEEDS[BR] = saneSpeed(MOTOR_SPEEDS[BR], -pitchOut - rollOut);
+  /* Calculate new motor speeds */
+  MOTOR_SPEEDS[TL] = saneSpeed(MOTOR_SPEEDS[TL], -pitchOut - rollOut);
+  MOTOR_SPEEDS[TR] = saneSpeed(MOTOR_SPEEDS[TR], -pitchOut + rollOut);
+  MOTOR_SPEEDS[BL] = saneSpeed(MOTOR_SPEEDS[BL], pitchOut - rollOut);
+  MOTOR_SPEEDS[BR] = saneSpeed(MOTOR_SPEEDS[BR], pitchOut + rollOut);
 
   /* Write speeds */
   int i;
