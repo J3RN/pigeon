@@ -64,6 +64,7 @@ int saneSpeed(int base, int change) {
     return base + change;
   }
 }
+
 /**************************************************************************/
 /*!
   @brief  Adjust all motors based on PID output
@@ -87,17 +88,7 @@ void adjustMotors() {
   }
 }
 
-/**************************************************************************/
-/*!
-  @brief  Start the motors and sensors
- */
-/**************************************************************************/
-void setup(void) {
-  Serial.begin(115200);
-
-  /* Initialise the sensors */
-  initSensors();
-
+void initControllers() {
   sensors_event_t accel_event;
   sensors_vec_t   orientation;
 
@@ -114,19 +105,59 @@ void setup(void) {
   /* Sensible limits */
   rollController.SetOutputLimits(-80, 80);
   pitchController.SetOutputLimits(-80, 80);
+}
 
+void attachMotors() {
   /* Attach motors */
   int i;
   for (i = 0; i < 4; i++) {
     MOTORS[i].attach(MOTOR_PINS[i]);
   }
   delay(1000);
+}
 
-  /* Initialize motors */
+void initMotors() {
+  int i;
   for (i = 0; i < 4; i++) {
     MOTORS[i].write(10);
   }
   delay(3000);
+}
+
+void printResults() {
+  /* Print results */
+  Serial.println(F("Motor Speeds:"));
+
+  Serial.print(F("TL: "));
+  Serial.print(MOTOR_SPEEDS[TL]);
+  Serial.print(F(" TR: "));
+  Serial.print(MOTOR_SPEEDS[TR]);
+  Serial.print(F(" BL: "));
+  Serial.print(MOTOR_SPEEDS[BL]);
+  Serial.print(F(" BR: "));
+  Serial.print(MOTOR_SPEEDS[BR]);
+  Serial.println(F(""));
+}
+
+/**************************************************************************/
+/*!
+  @brief  Start the motors and sensors
+ */
+/**************************************************************************/
+void setup(void) {
+  Serial.begin(115200);
+
+  /* Initialise the sensors */
+  initSensors();
+
+  /* Initialize the PID controllers */
+  initControllers();
+
+  /* Attach motors */
+  attachMotors();
+
+  /* Initialize motors */
+  initMotors();
 
   /* Calculate end time (now + 5 seconds) */
   endtime = millis() + 5000;
@@ -136,6 +167,7 @@ void setup(void) {
   rollController.SetMode(AUTOMATIC);
 
   /* Start motors (panic! panic!) */
+  int i;
   for (i = 0; i < 4; i++) {
     MOTOR_SPEEDS[i] = START_SPEED;
     MOTORS[i].write(START_SPEED);
@@ -155,18 +187,7 @@ void loop(void) {
       MOTORS[i].write(0);
     }
 
-    /* Print results */
-    Serial.println(F("Motor Speeds:"));
-
-    Serial.print(F("TL: "));
-    Serial.print(MOTOR_SPEEDS[TL]);
-    Serial.print(F(" TR: "));
-    Serial.print(MOTOR_SPEEDS[TR]);
-    Serial.print(F(" BL: "));
-    Serial.print(MOTOR_SPEEDS[BL]);
-    Serial.print(F(" BR: "));
-    Serial.print(MOTOR_SPEEDS[BR]);
-    Serial.println(F(""));
+    printResults();
 
     /* Die */
     while(1);
@@ -175,7 +196,7 @@ void loop(void) {
   sensors_event_t accel_event;
   sensors_vec_t   orientation;
 
-  /* Calculate pitch and roll from the raw accelerometer data */
+  /* Compute PID output from orientation */
   accel.getEvent(&accel_event);
   if (dof.accelGetOrientation(&accel_event, &orientation)) {
     pitchIn = orientation.pitch;
