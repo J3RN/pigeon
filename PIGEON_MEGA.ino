@@ -27,15 +27,17 @@ int MOTOR_SPEEDS[4];
 Servo MOTORS[4];
 
 /* PID controller constants */
-double Kp = 2, Ki = 1, Kd = 1;
+double Kp = 1, Ki = 0, Kd = 0;
+
+double setpoint;
 
 /* Pitch PID controller */
-double pitchSetpoint, pitchIn, pitchOut;
-PID pitchController(&pitchIn, &pitchOut, &pitchSetpoint, Kp, Ki, Kd, DIRECT);
+double pitchIn, pitchOut;
+PID pitchController(&pitchIn, &pitchOut, &setpoint, Kp, Ki, Kd, DIRECT);
 
 /* Roll PID controller */
-double rollSetpoint, rollIn, rollOut;
-PID rollController(&rollIn, &rollOut, &rollSetpoint, Kp, Ki, Kd, DIRECT);
+double rollIn, rollOut;
+PID rollController(&rollIn, &rollOut, &setpoint, Kp, Ki, Kd, DIRECT);
 
 /* Time counter */
 unsigned long endtime;
@@ -48,17 +50,7 @@ unsigned long endtime;
 void initSensors() {
   if(!accel.begin()) {
     /* There was a problem detecting the LSM303 ... check your connections */
-    Serial.println(F("Ooops, no LSM303 detected ... Check your wiring!"));
-    while(1);
-  }
-  if(!mag.begin()) {
-    /* There was a problem detecting the LSM303 ... check your connections */
-    Serial.println("Ooops, no LSM303 detected ... Check your wiring!");
-    while(1);
-  }
-  if(!bmp.begin()) {
-    /* There was a problem detecting the BMP180 ... check your connections */
-    Serial.println("Ooops, no BMP180 detected ... Check your wiring!");
+    Serial.println(F("Ooops, no accelerometer detected ... Check your wiring!"));
     while(1);
   }
 }
@@ -78,9 +70,9 @@ int saneSpeed(int base, int change) {
  */
 /**************************************************************************/
 void adjustMotors() {
-  Serial.print(F("uPitch: "));
+  Serial.print(F("Pitch: "));
   Serial.print(pitchOut);
-  Serial.print(F(" uRoll: "));
+  Serial.print(F(" Roll: "));
   Serial.println(rollOut);
 
   MOTOR_SPEEDS[TL] = saneSpeed(MOTOR_SPEEDS[TL], pitchOut + rollOut);
@@ -106,9 +98,22 @@ void setup(void) {
   /* Initialise the sensors */
   initSensors();
 
+  sensors_event_t accel_event;
+  sensors_vec_t   orientation;
+
+  accel.getEvent(&accel_event);
+  if (dof.accelGetOrientation(&accel_event, &orientation))
+  {
+    rollIn = orientation.roll;
+    pitchIn = orientation.pitch;
+  }
+
   /* Initialize the controllers */
-  pitchSetpoint = 0;
-  rollSetpoint = 0;
+  setpoint = 0;
+
+  /* Sensible limits */
+  rollController.SetOutputLimits(-80, 80);
+  pitchController.SetOutputLimits(-80, 80);
 
   /* Attach motors */
   int i;
@@ -173,19 +178,12 @@ void loop(void) {
   /* Calculate pitch and roll from the raw accelerometer data */
   accel.getEvent(&accel_event);
   if (dof.accelGetOrientation(&accel_event, &orientation)) {
-    /* 'orientation' should have valid .roll and .pitch fields */
     pitchIn = orientation.pitch;
     rollIn = orientation.roll;
-
-    /* Serial.print(pitchIn); */
-    /* Serial.print(F(" ")); */
-    /* Serial.print(rollIn); */
 
     pitchController.Compute();
     rollController.Compute();
 
     adjustMotors();
-
-    /* Serial.println(F("")); */
   }
 }
