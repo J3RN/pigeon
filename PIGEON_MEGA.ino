@@ -16,6 +16,8 @@
 #define MAX_SPEED 179
 #define MIN_SPEED 70
 
+#define RUN_TIME 10000
+
 /* Assign a unique ID to the sensors */
 Adafruit_10DOF                dof   = Adafruit_10DOF();
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(30301);
@@ -27,7 +29,7 @@ int MOTOR_SPEEDS[4];
 Servo MOTORS[4];
 
 /* PID controller constants */
-double Kp = 1, Ki = 0, Kd = 0;
+double Kp = 0.5, Ki = 0.5, Kd = 0.5;
 
 double setpoint;
 
@@ -77,10 +79,10 @@ void adjustMotors() {
   Serial.println(rollOut);
 
   /* Calculate new motor speeds */
-  MOTOR_SPEEDS[TL] = saneSpeed(MOTOR_SPEEDS[TL], -pitchOut - rollOut);
-  MOTOR_SPEEDS[TR] = saneSpeed(MOTOR_SPEEDS[TR], -pitchOut + rollOut);
-  MOTOR_SPEEDS[BL] = saneSpeed(MOTOR_SPEEDS[BL], pitchOut - rollOut);
-  MOTOR_SPEEDS[BR] = saneSpeed(MOTOR_SPEEDS[BR], pitchOut + rollOut);
+  MOTOR_SPEEDS[TL] = saneSpeed(MOTOR_SPEEDS[TL], (-pitchOut - rollOut) / 2);
+  MOTOR_SPEEDS[TR] = saneSpeed(MOTOR_SPEEDS[TR], (-pitchOut + rollOut) / 2);
+  MOTOR_SPEEDS[BL] = saneSpeed(MOTOR_SPEEDS[BL], (pitchOut - rollOut) / 2);
+  MOTOR_SPEEDS[BR] = saneSpeed(MOTOR_SPEEDS[BR], (pitchOut + rollOut) / 2);
 
   /* Write speeds */
   int i;
@@ -148,6 +150,10 @@ void printResults() {
 void setup(void) {
   Serial.begin(115200);
 
+  Serial.println("Press any key to begin initialization");
+  while (!Serial.available());
+  Serial.read();
+
   /* Initialise the sensors */
   initSensors();
 
@@ -160,8 +166,8 @@ void setup(void) {
   /* Initialize motors */
   initMotors();
 
-  /* Calculate end time (now + 5 seconds) */
-  endtime = millis() + 5000;
+  /* Calculate end time */
+  endtime = millis() + RUN_TIME;
 
   /* Turn PIDs on */
   pitchController.SetMode(AUTOMATIC);
@@ -181,7 +187,7 @@ void setup(void) {
  */
 /**************************************************************************/
 void loop(void) {
-  /* Kill */
+  /* Stop */
   if (millis() > endtime) {
     int i;
     for (i = 0; i < 4; i++) {
@@ -190,8 +196,11 @@ void loop(void) {
 
     printResults();
 
-    /* Die */
-    while(1);
+    Serial.println("Press any key to run again");
+    while (!Serial.available());
+    Serial.read();
+
+    endtime = millis() + RUN_TIME;
   }
 
   sensors_event_t accel_event;
