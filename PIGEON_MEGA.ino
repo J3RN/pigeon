@@ -17,7 +17,7 @@
 #define TR_PIN 4
 #define TL_PIN 5
 
-#define START_SPEED 90
+#define START_SPEED 75
 #define MAX_SPEED 130
 #define MIN_SPEED 70
 
