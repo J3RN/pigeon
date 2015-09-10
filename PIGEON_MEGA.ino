@@ -154,7 +154,7 @@ void printResults() {
 void setup(void) {
   Serial.begin(115200);
 
-  Serial.println("Press any key to begin initialization");
+  Serial.println("Enter any character to begin sensor and motor initialization");
   while (!Serial.available());
   Serial.read();
 
@@ -170,7 +170,7 @@ void setup(void) {
   /* Initialize motors */
   initMotors();
 
-  Serial.println("Press any key to begin motor test");
+  Serial.println("Enter any character to begin motor test");
   while (!Serial.available());
   Serial.read();
 
@@ -184,7 +184,7 @@ void setup(void) {
     MOTORS[i].write(0);
   }
 
-  Serial.println("Press any key to begin test");
+  Serial.println("Enter any character to begin test");
   while (!Serial.available());
   Serial.read();
 
@@ -217,7 +217,7 @@ void loop(void) {
 
     printResults();
 
-    Serial.println("Press any key to run again");
+    Serial.println("Enter any character to run again");
     while (!Serial.available());
     Serial.read();
 
