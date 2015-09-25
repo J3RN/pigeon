@@ -55,10 +55,10 @@ module platform_trimming() {
 
 module platform() {
     difference() {
-        translate([-45, -55, 5]) cube([100, 100, 3]);
+        translate([-50, -50, 5]) cube([100, 100, 3]);
         translate([0, 0, 4]) chassis_holes(radius = 3.5);
-        translate([0, 0, 4]) rotate(180) mega_holes(x = -15, y = 10);
-        translate([0, 0, 4])sensor_holes(x = -27, y = -5);
+        translate([0, 0, 4]) rotate(180) mega_holes(x = -15, y = 0);
+        translate([0, 0, 4]) sensor_holes(x = -30, y = 0);
     }
 }
 
