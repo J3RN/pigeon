@@ -34,7 +34,7 @@ int MOTOR_SPEEDS[4];
 Servo MOTORS[4];
 
 /* PID controller constants */
-double Kp = 1, Ki = 1, Kd = 1;
+double Kp = 0.009, Ki = 0, Kd = 0;
 
 double setpoint;
 
@@ -215,7 +215,7 @@ void loop(void) {
       MOTORS[i].write(0);
     }
 
-    printResults();
+    //printResults();
 
     Serial.println("Enter any character to run again");
     while (!Serial.available());
@@ -240,9 +240,15 @@ void loop(void) {
 
     // Print data
     Serial.print(F("Pitch: "));
-    Serial.print(pitchOut);
+    Serial.print(pitchIn);
     Serial.print(F(" Roll: "));
+    Serial.print(rollIn);
+
+    Serial.print(F(" PC: "));
+    Serial.print(pitchOut);
+    Serial.print(F(" RC: "));
     Serial.print(rollOut);
+
     Serial.print(" BL: ");
     Serial.print(MOTOR_SPEEDS[BL]);
     Serial.print(" BR: ");
