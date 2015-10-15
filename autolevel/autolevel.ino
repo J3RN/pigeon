@@ -67,6 +67,12 @@ void initSensors() {
   }
 }
 
+/**************************************************************************/
+/*!
+  @brief  Return a speed guaranteed to be within the range
+    MIN_SPEED - MAX_SPEED
+ */
+/**************************************************************************/
 int saneSpeed(int base, int change) {
   if ((base + change) > MAX_SPEED) {
     return MAX_SPEED;
@@ -96,6 +102,11 @@ void adjustMotors() {
   }
 }
 
+/**************************************************************************/
+/*!
+  @brief  Configure the PID controllers (limits, setpoints, and sample times)
+ */
+/**************************************************************************/
 void initControllers() {
   sensors_event_t accel_event;
   sensors_vec_t   orientation;
@@ -119,6 +130,11 @@ void initControllers() {
   pitchController.SetSampleTime(5);
 }
 
+/**************************************************************************/
+/*!
+  @brief  "Attach" each motor to it's pin
+ */
+/**************************************************************************/
 void attachMotors() {
   /* Attach motors */
   int i;
@@ -128,6 +144,11 @@ void attachMotors() {
   delay(1000);
 }
 
+/**************************************************************************/
+/*!
+  @brief  Write a low speed to each motor to initialize it
+ */
+/**************************************************************************/
 void initMotors() {
   int i;
   for (i = 0; i < 4; i++) {
@@ -136,6 +157,11 @@ void initMotors() {
   delay(3000);
 }
 
+/**************************************************************************/
+/*!
+  @brief  Set the speed for every motor to the given speed
+ */
+/**************************************************************************/
 void setAllSpeeds(int speed) {
   int i;
   for (i = 0; i < 4; i++) {
@@ -144,6 +170,11 @@ void setAllSpeeds(int speed) {
   }
 }
 
+/**************************************************************************/
+/*!
+  @brief  Set all the motors to their starting speed for three seconds
+ */
+/**************************************************************************/
 void testMotors() {
   setAllSpeeds(START_SPEED);
   delay(3000);
