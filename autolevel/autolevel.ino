@@ -203,14 +203,6 @@ void loop() {
     for (i = 0; i < 4; i++) {
       MOTORS[i].write(0);
     }
-
-    //printResults();
-
-    Serial.println("Enter any character to run again");
-    while (!Serial.available());
-    Serial.read();
-
-    endtime = millis() + RUN_TIME;
   }
 
   sensors_event_t accel_event;
