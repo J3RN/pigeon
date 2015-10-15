@@ -23,6 +23,11 @@
 
 #define RUN_TIME 10000
 
+#define INIT_PIN  13
+#define TEST_PIN  12
+#define START_PIN 11
+#define STOP_PIN  10
+
 /* Assign a unique ID to the sensors */
 Adafruit_10DOF                dof   = Adafruit_10DOF();
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(30301);
@@ -151,12 +156,10 @@ void printResults() {
   @brief  Start the motors and sensors
  */
 /**************************************************************************/
-void setup(void) {
+void setup() {
   Serial.begin(115200);
 
-  Serial.println("Enter any character to begin sensor and motor initialization");
-  while (!Serial.available());
-  Serial.read();
+  while (!digitalRead(INIT_PIN));
 
   /* Initialise the sensors */
   initSensors();
@@ -170,23 +173,12 @@ void setup(void) {
   /* Initialize motors */
   initMotors();
 
-  Serial.println("Enter any character to begin motor test");
-  while (!Serial.available());
-  Serial.read();
-
-  // Test motors
-  int i;
-  for (i = 0; i < 4; i++) {
-    MOTORS[i].write(START_SPEED);
+  while (!digitalRead(START_PIN)) {
+    // Optionally Test motors
+    if (!digitalRead(TEST_PIN)) {
+      testMotors();
+    }
   }
-  delay(3000);
-  for (i = 0; i < 4; i++) {
-    MOTORS[i].write(0);
-  }
-
-  Serial.println("Enter any character to begin test");
-  while (!Serial.available());
-  Serial.read();
 
   /* Calculate end time */
   endtime = millis() + RUN_TIME;
@@ -207,10 +199,11 @@ void setup(void) {
   @brief  Constantly check the pitch and roll and recalculate
  */
 /**************************************************************************/
-void loop(void) {
+void loop() {
   /* Stop */
-  if (millis() > endtime) {
+  if (millis() > endtime || digitalRead(STOP_PIN)) {
     int i;
+
     for (i = 0; i < 4; i++) {
       MOTORS[i].write(0);
     }
