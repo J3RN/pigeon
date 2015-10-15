@@ -136,19 +136,18 @@ void initMotors() {
   delay(3000);
 }
 
-void printResults() {
-  /* Print results */
-  Serial.println(F("Motor Speeds:"));
+void setAllSpeeds(int speed) {
+  int i;
+  for (i = 0; i < 4; i++) {
+    MOTOR_SPEEDS[i] = speed;
+    MOTORS[i].write(speed);
+  }
+}
 
-  Serial.print(F("TL: "));
-  Serial.print(MOTOR_SPEEDS[TL]);
-  Serial.print(F(" TR: "));
-  Serial.print(MOTOR_SPEEDS[TR]);
-  Serial.print(F(" BL: "));
-  Serial.print(MOTOR_SPEEDS[BL]);
-  Serial.print(F(" BR: "));
-  Serial.print(MOTOR_SPEEDS[BR]);
-  Serial.println(F(""));
+void testMotors() {
+  setAllSpeeds(START_SPEED);
+  delay(3000);
+  setAllSpeeds(0);
 }
 
 /**************************************************************************/
@@ -188,10 +187,7 @@ void setup() {
   rollController.SetMode(AUTOMATIC);
 
   /* Start motors (panic! panic!) */
-  for (i = 0; i < 4; i++) {
-    MOTOR_SPEEDS[i] = START_SPEED;
-    MOTORS[i].write(START_SPEED);
-  }
+  setAllSpeeds(START_SPEED);
 }
 
 /**************************************************************************/
