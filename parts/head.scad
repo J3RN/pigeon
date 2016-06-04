@@ -3,16 +3,17 @@ module screw_hole(radius = 1.8, height = 5) {
 }
 
 module stud(radius = 5) {
-    cylinder(h = 7, r1 = radius, r2 = radius);
+    cylinder(h = 5, r1 = radius, r2 = radius);
 }
 
 module chassis_holes(radius = 1.8) {
     x = 16;
     y = 36;
-    translate([-x, y, 0])   screw_hole(radius = radius, height = 9);
-    translate([x, y, 0])    screw_hole(radius = radius, height = 9);
-    translate([-x, -y, 0])  screw_hole(radius = radius, height = 9);
-    translate([x, -y, 0])   screw_hole(radius = radius, height = 9);
+    h = 7;
+    translate([-x, y, 0])   screw_hole(radius = radius, height = h);
+    translate([x, y, 0])    screw_hole(radius = radius, height = h);
+    translate([-x, -y, 0])  screw_hole(radius = radius, height = h);
+    translate([x, -y, 0])   screw_hole(radius = radius, height = h);
 }
 
 module chassis_studs() {
@@ -55,10 +56,10 @@ module platform_trimming() {
 
 module platform() {
     difference() {
-        translate([-50, -50, 7]) cube([100, 100, 3]);
-        translate([0, 0, 6]) chassis_holes(radius = 3.5);
-        translate([0, 0, 6]) rotate(180) mega_holes(x = -15, y = 0);
-        translate([0, 0, 6]) sensor_holes(x = -30, y = 0);
+        translate([-50, -50, 5]) cube([100, 100, 3]);
+        translate([0, 0, 4]) chassis_holes(radius = 3.5);
+        translate([0, 0, 4]) rotate(180) mega_holes(x = -15, y = 0);
+        translate([0, 0, 4]) sensor_holes(x = -30, y = 0);
     }
 }
 
