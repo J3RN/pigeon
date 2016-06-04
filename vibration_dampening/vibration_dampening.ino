@@ -109,6 +109,7 @@ void testMotors() {
 void setup() {
   Serial.begin(115200);
 
+  Serial.println(F("Waiting on init signal"));
   while (!digitalRead(INIT_PIN));
 
   /* Initialise the sensors */
@@ -120,12 +121,14 @@ void setup() {
   /* Initialize motors */
   initMotors();
 
-  while (!digitalRead(START_PIN)) {
-    // Optionally test motors
-    if (!digitalRead(TEST_PIN)) {
-      testMotors();
-    }
-  }
+  Serial.println(F("Waiting on test signal"));
+  while (!digitalRead(TEST_PIN));
+
+  /* Test motors */
+  testMotors();
+
+  Serial.println(F("Waiting on start signal"));
+  while (!digitalRead(START_PIN));
 
   /* Calculate end time */
   endtime = millis() + RUN_TIME;
@@ -149,6 +152,9 @@ void loop() {
     for (i = 0; i < 4; i++) {
       MOTORS[i].write(0);
     }
+
+    /* Stop indefinitely */
+    while(1);
   }
 
   sensors_event_t accel_event;
@@ -159,6 +165,6 @@ void loop() {
   if (dof.accelGetOrientation(&accel_event, &orientation)) {
     Serial.print(orientation.pitch);
     Serial.print(",");
-    Serial.print(orientation.roll);
+    Serial.println(orientation.roll);
   }
 }
