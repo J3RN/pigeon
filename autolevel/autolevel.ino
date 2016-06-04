@@ -108,15 +108,16 @@ void adjustMotors() {
  */
 /**************************************************************************/
 void initControllers() {
-  sensors_event_t accel_event;
-  sensors_vec_t   orientation;
+  /* Do not believe this is necessary */
+  /* sensors_event_t accel_event; */
+  /* sensors_vec_t   orientation; */
 
-  accel.getEvent(&accel_event);
-  if (dof.accelGetOrientation(&accel_event, &orientation))
-  {
-    rollIn = orientation.roll;
-    pitchIn = orientation.pitch;
-  }
+  /* accel.getEvent(&accel_event); */
+  /* if (dof.accelGetOrientation(&accel_event, &orientation)) */
+  /* { */
+  /*   rollIn = orientation.roll; */
+  /*   pitchIn = orientation.pitch; */
+  /* } */
 
   /* Initialize the controllers */
   setpoint = 0;
